@@ -1,0 +1,6 @@
+---
+  - name: Copy mail aliases
+    template: src=aliases.j2 dest=/etc/aliases owner=root group=root mode=0644
+
+  - name: Copy mailname
+    template: src=mailname.j2 dest=/etc/mailname owner=root group=root mode=0644

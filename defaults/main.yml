@@ -1,0 +1,12 @@
+---
+exim4_local_interfaces: '127.0.0.1 ; ::1'
+exim4_root_email: antti.salminen@kirjastot.fi
+exim4_localdelivery: mail_spool
+exim4_dkim_key_length: 2048
+exim4_dkim_selector: dkim
+exim4_dkim_keyfile_directory: common/files/dkim
+exim4_dkim_private_keyfile: "{{exim4_dkim_keyfile_directory}}/{{inventory_hostname}}.{{exim4_dkim_selector}}.dkim.private.key"
+exim4_dkim_public_keyfile: "{{exim4_dkim_keyfile_directory}}/{{inventory_hostname}}.{{exim4_dkim_selector}}.dkim.public.key"
+exim4_main_domain: "{{inventory_hostname}}"
+exim4_enable_tls: true
+exim4_enable_dkim: false

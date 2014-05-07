@@ -1,0 +1,13 @@
+---
+
+- name: Stop sendmail
+  service: name=sendmail state=stopped
+  ignore_errors: yes
+
+- name: Uninstall sendmail
+  apt: pkg={{ item }} state=absent
+  with_items:
+    - sendmail
+    - sendmail-base
+    - sendmail-bin
+    - sendmail-cf

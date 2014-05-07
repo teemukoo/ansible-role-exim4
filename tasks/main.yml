@@ -1,0 +1,8 @@
+---
+# file: mysql/tasks/main.yml
+
+- include: remove_sendmail.yml
+- include: dkim.yml
+  when: exim4_enable_dkim
+- include: generic.yml
+- include: exim4.yml
