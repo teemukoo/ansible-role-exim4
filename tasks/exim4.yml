@@ -33,7 +33,7 @@
 
   - name: Override primary hostname
     template: src=exim4.conf.localmacros-hostnameoverride.j2 dest=/etc/exim4/conf.d/main/000_localmacros_hostnameoverride
-    when: override_primary_hostname is defined
+    when: exim4_primary_hostname != inventory_hostname
     notify:
       - update exim4 config
       - restart exim4
@@ -45,9 +45,24 @@
       - update exim4 config
       - restart exim4
 
+  - name: Disable TLS
+    file: path=/etc/exim4/conf.d/main/000_localmacros_tls state=absent
+    when: not exim4_enable_tls
+    notify:
+      - update exim4 config
+      - restart exim4
+
+
   - name: Enable DKIM
     template: src=exim4.conf.localmacros-dkim.j2 dest=/etc/exim4/conf.d/main/000_localmacros_dkim
     when: exim4_enable_dkim
+    notify:
+      - update exim4 config
+      - restart exim4
+
+  - name: Disable DKIM
+    file: path=/etc/exim4/conf.d/main/000_localmacros_dkim state=absent
+    when: not exim4_enable_dkim
     notify:
       - update exim4 config
       - restart exim4

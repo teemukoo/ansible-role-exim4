@@ -1,7 +1,8 @@
 ---
 
+# For some reason this works without specifying inventory_dir with private but not with kifi-p...
 - name: Make sure local directory for dkim keys exists
-  local_action: file state=directory path={{exim4_dkim_keyfile_directory}}
+  local_action: file state=directory path={{inventory_dir}}{{exim4_dkim_keyfile_directory}}
   sudo: no
 
 - name: Generate a private key for DKIM
