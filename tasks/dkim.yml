@@ -6,18 +6,22 @@
   sudo: no
 
 - name: Generate a private key for DKIM
-  local_action: shell openssl genrsa -out {{exim4_dkim_private_keyfile}} {{exim4_dkim_key_length}}
+  local_action: shell echo '{{ssl_passphrase}}' | openssl genrsa -passout stdin -out {{exim4_dkim_private_keyfile}} {{exim4_dkim_key_length}}
                 creates={{exim4_dkim_private_keyfile}}
   sudo: no
-
-# - name: Copy private key to server
-#   copy: src={{exim4_dkim_private_keyfile}} dest=/etc/exim4/dkim.private.key.{{exim4_dkim_selector}} mode=0440 owner=root group=Debian-exim
+  when: exim4_dkim_private_keyfile is defined
 
 - name: Write out a public key that is suitable for publishing in DNS for DKIM
   local_action: shell openssl rsa -in {{exim4_dkim_private_keyfile}} -pubout -outform pem 2>/dev/null | grep -v "^-"  | tr -d '\n' > {{exim4_dkim_public_keyfile}}
                 creates={{exim4_dkim_public_keyfile}}
   sudo: no
 
+- name: decrypt ssl private key for installation
+  local_action: shell echo '{{ssl_passphrase}}' | /usr/bin/openssl rsa -passin stdin -in {{exim4_dkim_private_keyfile}}
+  register: ssl_key
+  sudo: false
+  when: exim4_dkim_private_keyfile is defined
+
 - name: Copy dkim private key if defined
-  copy: src={{exim4_dkim_private_keyfile}} dest=/etc/exim4/ mode=0440 owner=root group=Debian-exim
+  copy: content='{{ ssl_key.stdout }}' dest=/etc/exim4/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}private.key mode=0440 owner=root group=Debian-exim
   when: exim4_dkim_private_keyfile is defined

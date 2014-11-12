@@ -1,10 +1,14 @@
 ---
+
+PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH: "{{playbook_dir}}/assets/private/roles"
+
 exim4_local_interfaces: '127.0.0.1 ; ::1'
+exim4_assets_path: "{{PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH}}/exim4"
 exim4_root_email: antti.salminen@kirjastot.fi
 exim4_localdelivery: mail_spool
 exim4_dkim_key_length: 2048
 exim4_dkim_selector: dkim
-exim4_dkim_keyfile_directory: common/files/dkim
+exim4_dkim_keyfile_directory: "{{exim4_assets_path}}/dkim/"
 exim4_dkim_keyfile_common_suffix: .{{exim4_dkim_selector}}.dkim.
 exim4_primary_hostname: "{{inventory_hostname}}"
 exim4_dkim_private_keyfile: "{{exim4_dkim_keyfile_directory}}/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}private.key"
