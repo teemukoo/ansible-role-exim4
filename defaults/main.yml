@@ -17,3 +17,4 @@ exim4_main_domain: "{{inventory_hostname}}"
 exim4_enable_tls: true
 exim4_enable_dkim: false
 exim4_queue_interval: 30m
+exim4_log_to_syslog: false
