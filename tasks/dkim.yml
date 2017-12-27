@@ -3,23 +3,23 @@
 # For some reason this works without specifying inventory_dir with private but not with kifi-p...
 - name: Make sure local directory for dkim keys exists
   local_action: file state=directory path={{inventory_dir}}{{exim4_dkim_keyfile_directory}}
-  sudo: no
+  become: no
 
 - name: Generate a private key for DKIM
   local_action: shell echo '{{ssl_passphrase}}' | openssl genrsa -passout stdin -out {{exim4_dkim_private_keyfile}} {{exim4_dkim_key_length}}
                 creates={{exim4_dkim_private_keyfile}}
-  sudo: no
+  become: no
   when: exim4_dkim_private_keyfile is defined
 
 - name: Write out a public key that is suitable for publishing in DNS for DKIM
   local_action: shell openssl rsa -in {{exim4_dkim_private_keyfile}} -pubout -outform pem 2>/dev/null | grep -v "^-"  | tr -d '\n' > {{exim4_dkim_public_keyfile}}
                 creates={{exim4_dkim_public_keyfile}}
-  sudo: no
+  become: no
 
 - name: decrypt ssl private key for installation
   local_action: shell echo '{{ssl_passphrase}}' | /usr/bin/openssl rsa -passin stdin -in {{exim4_dkim_private_keyfile}}
   register: ssl_key
-  sudo: false
+  become: no
   when: exim4_dkim_private_keyfile is defined
 
 - name: Copy dkim private key if defined
