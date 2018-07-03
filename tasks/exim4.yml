@@ -38,6 +38,14 @@
       - update exim4 config
       - restart exim4
 
+  - name: Configure hubbed hosts
+    template: src=hubbed_hosts.j2 dest=/etc/exim4/hubbed_hosts
+    when: exim4_hubbed_hosts is defined
+    notify:
+      - update exim4 config
+      - restart exim4
+
+
   - name: Enable TLS
     template: src=exim4.conf.localmacros-tls.j2 dest=/etc/exim4/conf.d/main/000_localmacros_tls
     when: exim4_enable_tls

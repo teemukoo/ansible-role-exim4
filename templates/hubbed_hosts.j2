@@ -1,0 +1,3 @@
+{% if exim4_hubbed_hosts is defined %}{% for host in exim4_hubbed_hosts %}
+{{host.name}}: {{host.hub}}
+{% endfor %}{% endif %}
