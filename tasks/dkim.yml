@@ -19,6 +19,7 @@
 - name: decrypt ssl private key for installation
   local_action: shell echo '{{ssl_passphrase}}' | /usr/bin/openssl rsa -passin stdin -in {{exim4_dkim_private_keyfile}}
   register: ssl_key
+  always_run: yes
   become: no
   when: exim4_dkim_private_keyfile is defined
 
