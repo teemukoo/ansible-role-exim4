@@ -1,15 +1,10 @@
 ---
-  - name: Copy mail aliases
-    template: src=aliases.j2 dest=/etc/aliases owner=root group=root mode=0644
+- name: Copy mail aliases
+  template: src=aliases.j2 dest=/etc/aliases owner=root group=root mode=0644
+  notify:
+    - restart exim4
 
-  - name: Copy mailname
-    template: src=mailname.j2 dest=/etc/mailname owner=root group=root mode=0644
-
-  - name: Set exim4 log to syslog.
-    template:
-      src: 02_exim4-config_options.j2
-      dest: /etc/exim4/conf.d/main/02_exim4-config_options
-      owner: root
-      group: root
-      mode: 0644
-    when: exim4_log_to_syslog == true
+- name: Copy mailname
+  template: src=mailname.j2 dest=/etc/mailname owner=root group=root mode=0644
+  notify:
+    - restart exim4
