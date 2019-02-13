@@ -1,7 +1,13 @@
 ---
-# file: mysql/tasks/main.yml
 
 - include: remove_sendmail.yml
+
+- name: Install packages for mail sending
+  apt:
+    name:
+      - exim4
+      - heirloom-mailx
+
 - include: dkim.yml
   when: exim4_enable_dkim
 - include: generic.yml

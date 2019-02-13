@@ -26,3 +26,5 @@
 - name: Copy dkim private key if defined
   copy: content='{{ ssl_key.stdout }}' dest=/etc/exim4/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}private.key mode=0440 owner=root group=Debian-exim
   when: exim4_dkim_private_keyfile is defined
+  notify:
+    - restart exim4

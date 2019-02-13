@@ -1,3 +1,5 @@
-# file: webserver/handlers/main.yml
----
-- include: exim4.yml
+# Restart and reload will regenerate exim config from conf.d/.
+- name: restart exim4
+  service:
+    name: exim4
+    state: restarted

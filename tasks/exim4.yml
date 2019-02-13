@@ -1,76 +1,25 @@
 ---
+- name: Copy update-exim4.conf.conf
+  template: src=update-exim4.j2
+            dest=/etc/exim4/update-exim4.conf.conf mode=0664 owner=root
+            group=root
+  notify:
+    - restart exim4
 
-  - name: Install packages for mail sending
-    apt: pkg={{ item }} state=present
-    with_items:
-       - exim4
-       - heirloom-mailx
+- name: Copy /etc/default/exim4
+  template: src=exim4.j2 dest=/etc/default/exim4 mode=0644 owner=root group=root
+  notify:
+    - restart exim4
 
-  - name: Copy update-exim4.conf.conf
-    template: src=update-exim4.j2
-              dest=/etc/exim4/update-exim4.conf.conf mode=0664 owner=root
-              group=root
-    notify:
-      - update exim4 config
-      - restart exim4
+- name: Configure hubbed hosts
+  template: src=hubbed_hosts.j2 dest=/etc/exim4/hubbed_hosts
+  when: exim4_hubbed_hosts is defined
+  notify:
+    - restart exim4
 
-  # There are small changes in wheezy to the file so use different for it.
-  # - name: Copy /etc/exim4/exim4.conf.template
-  #   template: src={{item}} dest=/etc/exim4/exim4.conf.template
-  #             mode=0644 owner=root group=root
-  #   first_available_file:
-  #       - exim4.conf.template.{{ansible_lsb.codename}}.j2
-  #       - exim4.conf.template.j2
-  #   notify:
-  #     - update exim4 config
-  #     - restart exim4
-
-  - name: Copy /etc/default/exim4
-    template: src=exim4.j2 dest=/etc/default/exim4 mode=0644 owner=root group=root
-    notify:
-      - update exim4 config
-      - restart exim4
-
-  - name: Override primary hostname
-    template: src=exim4.conf.localmacros-hostnameoverride.j2 dest=/etc/exim4/conf.d/main/000_localmacros_hostnameoverride
-    when: exim4_primary_hostname != inventory_hostname
-    notify:
-      - update exim4 config
-      - restart exim4
-
-  - name: Configure hubbed hosts
-    template: src=hubbed_hosts.j2 dest=/etc/exim4/hubbed_hosts
-    when: exim4_hubbed_hosts is defined
-    notify:
-      - update exim4 config
-      - restart exim4
-
-
-  - name: Enable TLS
-    template: src=exim4.conf.localmacros-tls.j2 dest=/etc/exim4/conf.d/main/000_localmacros_tls
-    when: exim4_enable_tls
-    notify:
-      - update exim4 config
-      - restart exim4
-
-  - name: Disable TLS
-    file: path=/etc/exim4/conf.d/main/000_localmacros_tls state=absent
-    when: not exim4_enable_tls
-    notify:
-      - update exim4 config
-      - restart exim4
-
-
-  - name: Enable DKIM
-    template: src=exim4.conf.localmacros-dkim.j2 dest=/etc/exim4/conf.d/main/000_localmacros_dkim
-    when: exim4_enable_dkim
-    notify:
-      - update exim4 config
-      - restart exim4
-
-  - name: Disable DKIM
-    file: path=/etc/exim4/conf.d/main/000_localmacros_dkim state=absent
-    when: not exim4_enable_dkim
-    notify:
-      - update exim4 config
-      - restart exim4
+- name: Copy localmacros
+  template:
+    src: localmacros.j2
+    dest: /etc/exim4/conf.d/main/000_localmacros
+  notify:
+    - restart exim4
