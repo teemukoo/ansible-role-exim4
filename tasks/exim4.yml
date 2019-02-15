@@ -23,3 +23,20 @@
     dest: /etc/exim4/conf.d/main/000_localmacros
   notify:
     - restart exim4
+
+- name: Copy modified acl file check_rcpt
+  template:
+    src: 30_exim4-config_check_rcpt.j2
+    dest: /etc/exim4/conf.d/acl/30_exim4-config_check_rcpt
+  when: exim4_is_smarthost
+  notify:
+    - restart exim4
+
+- name: Copy modified smtp smarthost transport config
+  template:
+    src: 30_exim4-config_remote_smtp_smarthost.j2
+    dest: /etc/exim4/conf.d/transport/30_exim4-config_remote_smtp_smarthost
+  when: exim4_use_client_certificates
+  notify:
+    - restart exim4
+

@@ -1,0 +1,39 @@
+
+- name: Copy self-signed ca cert to trust store.
+  copy:
+    src: "{{ exim_certificate_ca_path }}"
+    dest: /usr/local/share/ca-certificates/
+    remote_src: true
+  when: exim4_is_smarthost or exim4_use_client_certificates
+  notify:
+    - restart exim4
+
+- name: Update certificate trust store.
+  command: update-ca-certificates
+  when: exim4_is_smarthost or exim4_use_client_certificates
+  notify:
+    - restart exim4
+
+# This needs certtool on control host.
+# Getting fingerprint with openssl is more complicated than certtool.
+- name: Get certificate fingerprint for all clients.
+  command: >
+    certtool
+    --infile="{{ PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH }}ssl_certificate/{{ item }}/exim_relay.crt"
+    --fingerprint
+    --hash=sha256
+  become: no
+  delegate_to: localhost
+  loop: "{{ exim4_smarthost_relay_for }}"
+  register: exim4_cert_fingerprints
+  when: exim4_is_smarthost
+
+- name: Define exim4_smarthost_relay_hashes.
+  set_fact:
+    exim4_smarthost_relay_hashes: "{{
+      exim4_cert_fingerprints.results
+      | map(attribute='stdout')
+      | map('upper')
+      | list()
+    }}"
+  when: exim4_is_smarthost

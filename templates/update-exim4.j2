@@ -16,16 +16,16 @@
 #
 # This is a Debian specific file
 
-dc_eximconfig_configtype='internet'
+dc_eximconfig_configtype='{{ exim4_configtype }}'
 dc_other_hostnames='{{exim4_main_domain}}{%if exim4_other_domains is defined %}{%for domain in exim4_other_domains %}
 ;{{domain}}{%endfor%}
 {% endif %}'
-dc_local_interfaces='{{exim4_local_interfaces}}'
+dc_local_interfaces='{{ exim4_local_interfaces }}'
 dc_readhost=''
 dc_relay_domains=''
 dc_minimaldns='false'
 dc_relay_nets=''
-dc_smarthost=''
+dc_smarthost='{{ exim4_smarthost }}'
 CFILEMODE='644'
 dc_use_split_config='true'
 dc_hide_mailname=''
