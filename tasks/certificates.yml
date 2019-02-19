@@ -14,14 +14,13 @@
   notify:
     - restart exim4
 
-# This needs certtool on control host.
-# Getting fingerprint with openssl is more complicated than certtool.
 - name: Get certificate fingerprint for all clients.
   command: >
-    certtool
-    --infile="{{ PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH }}ssl_certificate/{{ item }}/exim_relay.crt"
-    --fingerprint
-    --hash=sha256
+    openssl x509
+    -noout
+    -in "{{ PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH }}ssl_certificate/{{ item }}/exim_relay.crt"
+    -fingerprint
+    -sha256
   become: no
   delegate_to: localhost
   loop: "{{ exim4_smarthost_relay_for }}"
@@ -33,7 +32,8 @@
     exim4_smarthost_relay_hashes: "{{
       exim4_cert_fingerprints.results
       | map(attribute='stdout')
-      | map('upper')
+      | map('replace', 'SHA256 Fingerprint=', '')
+      | map('replace', ':', '')
       | list()
     }}"
   when: exim4_is_smarthost
