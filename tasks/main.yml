@@ -11,4 +11,5 @@
 - include: dkim.yml
   when: exim4_enable_dkim
 - include: generic.yml
+- include: certificates.yml
 - include: exim4.yml
