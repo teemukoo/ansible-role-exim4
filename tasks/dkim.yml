@@ -2,29 +2,88 @@
 
 # For some reason this works without specifying inventory_dir with private but not with kifi-p...
 - name: Make sure local directory for dkim keys exists
-  local_action: file state=directory path={{inventory_dir}}{{exim4_dkim_keyfile_directory}}
+  file:
+    state: directory
+    path: "{{ inventory_dir }}{{ exim4_dkim_keyfile_directory }}"
+  delegate_to: localhost
   become: no
 
-- name: Generate a private key for DKIM
-  local_action: shell echo '{{ssl_passphrase}}' | openssl genrsa -passout stdin -out {{exim4_dkim_private_keyfile}} {{exim4_dkim_key_length}}
-                creates={{exim4_dkim_private_keyfile}}
+- name: Generate private keys for DKIM
+  shell: |
+    echo '{{ ssl_passphrase }}' \
+    | openssl genrsa \
+    -passout stdin \
+    -out "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}private.key" \
+    {{ exim4_dkim_key_length }}
+  args:
+    creates: "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}private.key"
   become: no
-  when: exim4_dkim_private_keyfile is defined
+  delegate_to: localhost
+  loop: "{{ exim4_dkim_domains }}"
 
-- name: Write out a public key that is suitable for publishing in DNS for DKIM
-  local_action: shell openssl rsa -in {{exim4_dkim_private_keyfile}} -pubout -outform pem 2>/dev/null | grep -v "^-"  | tr -d '\n' > {{exim4_dkim_public_keyfile}}
-                creates={{exim4_dkim_public_keyfile}}
+- name: Write out a public keys that are suitable for publishing in DNS for DKIM
+  shell: |
+    openssl rsa \
+    -in "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}private.key" \
+    -pubout \
+    -outform pem \
+    2>/dev/null \
+    | grep -v "^-" \
+    | tr -d '\n' \
+    > "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}public.key"
+  args:
+    creates: "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}public.key"
+  loop: "{{ exim4_dkim_domains }}"
+  delegate_to: localhost
   become: no
 
-- name: decrypt ssl private key for installation
-  local_action: shell echo '{{ssl_passphrase}}' | openssl rsa -passin stdin -in {{exim4_dkim_private_keyfile}}
-  register: ssl_key
+- name: Decrypt ssl private keys for installation
+  shell: |
+    echo '{{ ssl_passphrase }}' \
+    | openssl rsa \
+    -passin stdin \
+    -in "{{ exim4_dkim_keyfile_directory }}/{{ item }}{{ exim4_dkim_keyfile_common_suffix }}private.key"
+  register: exim4_ssl_keys
   check_mode: no
+  loop: "{{ exim4_dkim_domains }}"
+  delegate_to: localhost
   become: no
-  when: exim4_dkim_private_keyfile is defined
 
-- name: Copy dkim private key if defined
-  copy: content='{{ ssl_key.stdout }}' dest=/etc/exim4/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}private.key mode=0440 owner=root group=Debian-exim
-  when: exim4_dkim_private_keyfile is defined
+- name: Create folder for dkim keys
+  file:
+    path: /etc/exim4/dkim
+    state: directory
+
+- name: Copy dkim private keys to host
+  copy:
+    content: '{{ item.0 }}'
+    dest: "/etc/exim4/dkim/{{ item.1 }}{{ exim4_dkim_keyfile_common_suffix }}private.key"
+    mode: 0440
+    owner: root
+    group: Debian-exim
+  loop: "{{
+    exim4_ssl_keys.results
+    | map(attribute='stdout')
+    | zip(exim4_dkim_domains)
+    | list()
+  }}"
+  register: exim4_dkim_copied_keys
   notify:
     - restart exim4
+
+- name: List installed keys
+  command: ls -1 /etc/exim4/dkim/
+  register: exim4_list_dkim_keys
+
+- name: Remove old DKIM keys
+  file:
+    path: /etc/exim4/dkim/{{ item }}
+    state: absent
+  loop: "{{ exim4_list_dkim_keys.stdout_lines }}"
+  when: |
+    item not in (
+      exim4_dkim_copied_keys.results
+      | map(attribute='path')
+      | map('basename')
+      | list()
+    )

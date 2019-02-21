@@ -11,11 +11,10 @@ exim4_dkim_selector: dkim
 exim4_dkim_keyfile_directory: "{{exim4_assets_path}}/dkim/"
 exim4_dkim_keyfile_common_suffix: .{{exim4_dkim_selector}}.dkim.
 exim4_primary_hostname: "{{inventory_hostname}}"
-exim4_dkim_private_keyfile: "{{exim4_dkim_keyfile_directory}}/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}private.key"
-exim4_dkim_public_keyfile: "{{exim4_dkim_keyfile_directory}}/{{exim4_primary_hostname}}{{exim4_dkim_keyfile_common_suffix}}public.key"
 exim4_main_domain: "{{inventory_hostname}}"
 exim4_enable_tls: true
 exim4_enable_dkim: false
+exim4_dkim_domains: []
 exim4_queue_interval: 30m
 exim4_log_to_syslog: false
 exim4_configtype: 'internet'
