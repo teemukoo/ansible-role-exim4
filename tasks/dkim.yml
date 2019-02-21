@@ -83,7 +83,7 @@
   when: |
     item not in (
       exim4_dkim_copied_keys.results
-      | map(attribute='path')
+      | map(attribute='dest')
       | map('basename')
       | list()
     )
