@@ -40,3 +40,9 @@
   notify:
     - restart exim4
 
+- name: Copy email-addresses
+  template:
+    src: email-addresses.j2
+    dest: /etc/email-addresses
+  notify:
+    - restart exim4
