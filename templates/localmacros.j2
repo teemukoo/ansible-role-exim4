@@ -41,3 +41,7 @@ REMOTE_SMTP_SMARTHOST_TLS_CERTIFICATE = {{ exim_certificate_path }}
 REMOTE_SMTP_SMARTHOST_PRIVATEKEY = {{ exim_certificate_key_path }}
 REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS = *
 {% endif %}
+
+{% if exim4_ignore_smtp_line_length_limit %}
+IGNORE_SMTP_LINE_LENGTH_LIMIT = true
+{% endif %}

@@ -27,3 +27,4 @@ exim_certificate_ca_path: /etc/ssl/local/certs/exim_relay.bundle.crt
 exim4_smarthost_relay_hashes: []
 exim4_smarthost_relay_for: []
 exim4_email_addresses: []
+exim4_ignore_smtp_line_length_limit: false
