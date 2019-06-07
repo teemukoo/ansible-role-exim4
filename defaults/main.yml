@@ -28,3 +28,4 @@ exim4_smarthost_relay_hashes: []
 exim4_smarthost_relay_for: []
 exim4_email_addresses: []
 exim4_ignore_smtp_line_length_limit: false
+exim4_partial_smarthost_percentage: 0

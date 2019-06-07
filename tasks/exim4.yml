@@ -40,6 +40,14 @@
   notify:
     - restart exim4
 
+- name: Copy smtp smarthost partial transport config
+  template:
+    src: 160_exim4-config_smarthost_partial.j2
+    dest: /etc/exim4/conf.d/router/160_exim4-config_smarthost_partial
+  when: exim4_partial_smarthost_percentage > 0
+  notify:
+    - restart exim4
+
 - name: Copy email-addresses
   template:
     src: email-addresses.j2

@@ -1,0 +1,17 @@
+
+# Route only some messages to smarthost.
+# Used to send only part of traffic to smarthost
+# and rest normally on remote_smtp transport.
+# Use with dc_configtype = 'internet'.
+
+# This is copied from exim default smarthost router and condition is added to it.
+smarthost:
+  debug_print = "R: smarthost for $local_part@$domain"
+  condition = ${if <{${randint:100}}{ {{ exim4_partial_smarthost_percentage }} }}
+  driver = manualroute
+  domains = ! +local_domains
+  transport = remote_smtp_smarthost
+  route_list = * DCsmarthost byname
+  host_find_failed = ignore
+  same_domain_copy_routing = yes
+  no_more
