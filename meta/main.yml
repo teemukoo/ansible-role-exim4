@@ -116,12 +116,4 @@ galaxy_info:
   #- packaging
   #- system
   #- web
-dependencies:
-  - role: ajsalminen.ssl_certificate
-    ssl_certificate_key_common_name: exim_relay
-    ssl_certificate_assets_path: "{{ PLAYBOOK_PRIVATE_ROLE_ASSETS_PATH }}ssl_certificate/{{ inventory_hostname }}"
-    ssl_certificate_ca_subject: "/CN=kifi-ca"
-    ssl_certificate_subject: "/CN={{ inventory_hostname }}"
-    ssl_certificate_group: Debian-exim
-    when: exim4_is_smarthost or exim4_use_client_certificates
-    tags: ssl
+dependencies: []
