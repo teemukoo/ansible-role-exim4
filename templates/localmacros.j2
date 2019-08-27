@@ -45,3 +45,15 @@ REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS = *
 {% if exim4_ignore_smtp_line_length_limit %}
 IGNORE_SMTP_LINE_LENGTH_LIMIT = true
 {% endif %}
+
+{% if exim4_smtp_accept_queue_per_connection is defined %}
+smtp_accept_queue_per_connection = {{ exim4_smtp_accept_queue_per_connection }}
+{% endif %}
+
+{% if exim4_queue_run_max is defined %}
+queue_run_max = {{ exim4_queue_run_max }}
+{% endif %}
+
+{% if exim4_remote_max_parallel is defined %}
+remote_max_parallel = {{ exim4_remote_max_parallel }}
+{% endif %}
