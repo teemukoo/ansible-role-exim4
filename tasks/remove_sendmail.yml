@@ -5,9 +5,10 @@
   ignore_errors: yes
 
 - name: Uninstall sendmail
-  apt: pkg={{ item }} state=absent
-  with_items:
-    - sendmail
-    - sendmail-base
-    - sendmail-bin
-    - sendmail-cf
+  apt:
+    state: absent
+    name:
+      - sendmail
+      - sendmail-base
+      - sendmail-bin
+      - sendmail-cf
