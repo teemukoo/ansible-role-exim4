@@ -1,8 +1,8 @@
 {% if exim4_enable_dkim %}
 # Sign sent mails with DKIM.
 DKIM_CANON = relaxed
-DKIM_DOMAIN = ${sender_address_domain}
-DKIM_FILE = CONFDIR/dkim/${lc:${sender_address_domain}}.{{ exim4_dkim_selector }}.dkim.private.key
+DKIM_DOMAIN = kirjastot.fi
+DKIM_FILE = CONFDIR/dkim/kirjastot.fi.{{ exim4_dkim_selector }}.dkim.private.key
 DKIM_PRIVATE_KEY = ${if exists{DKIM_FILE}{DKIM_FILE}{0}}
 DKIM_SELECTOR = ${extract{-4}{.}{DKIM_PRIVATE_KEY}}
 {% endif %}
