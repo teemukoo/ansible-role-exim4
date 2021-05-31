@@ -13,4 +13,5 @@ noc: root
 security: root
 root: {{exim4_root_email}}
 {% if exim4_aliases is defined %}{% for alias in exim4_aliases %}
-{{alias.name}}: {{alias.addresses|join(', ') }}{% endfor %}{% endif %}
+{{alias.name}}: {{alias.addresses|join(', ') }}
+{% endfor %}{% endif %}
