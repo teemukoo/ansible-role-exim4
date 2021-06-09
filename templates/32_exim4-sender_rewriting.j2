@@ -1,0 +1,7 @@
+# Skip rewriting for the specified DKIM domains
+{% if exim4_dkim_domains is defined %}{% for domain in exim4_dkim_domains %}
+*@{{ domain }} * Fs
+{% endfor %}{% endif %}
+
+# Rewrite all other addresses with a 'bounces' address on the primary hostname
+*@* bounces@{{ exim4_primary_hostname }} Fs
