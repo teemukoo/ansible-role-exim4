@@ -48,6 +48,13 @@
   notify:
     - restart exim4
 
+- name: Copy sender address rewriting config
+  template:
+    src: 32_exim4-sender_rewriting.j2
+    dest: /etc/exim4/conf.d/rewrite/32_exim4-sender_rewriting
+  notify:
+    - restart exim4
+
 - name: Copy email-addresses
   template:
     src: email-addresses.j2
